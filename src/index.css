@@ -1,0 +1,507 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --bg-color: #f3f4f6;
+  --text-main: #1f2937;
+  --text-light: #6b7280;
+  --bg-card: #ffffff;
+  --border-color: #e5e7eb;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+/* ========== LAYOUT ========== */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* ========== FORMS ========== */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: var(--font-family);
+  /* Prevent iOS zoom on focus */
+  font-size: 16px;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ========== BUTTONS ========== */
+
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s;
+  /* Better touch targets on mobile */
+  min-height: 44px;
+  font-family: var(--font-family);
+}
+
+.btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-danger {
+  background-color: var(--error);
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+/* ========== ALERTS ========== */
+
+.alert {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  color: var(--error);
+  border: 1px solid #fecaca;
+}
+
+.alert-success {
+  background-color: #ecfdf5;
+  color: var(--success);
+  border: 1px solid #a7f3d0;
+}
+
+/* ========== HEADER & NAV ========== */
+
+.header {
+  background-color: var(--bg-card);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links a {
+  margin-left: 1rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary-color);
+}
+
+/* Hamburger toggle — hidden on desktop */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 110;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--text-main);
+  margin: 5px 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-btn.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ========== TABLES (desktop) ========== */
+
+.desktop-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.desktop-table th,
+.desktop-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.desktop-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+/* Legacy table styles (for any remaining tables) */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+/* ========== MOBILE CARDS (replaces tables on small screens) ========== */
+
+.mobile-card-list {
+  display: none;
+}
+
+.mobile-visit-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-left: 4px solid var(--primary-color);
+}
+
+.mobile-visit-card .card-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.mobile-visit-card .card-row .label {
+  color: var(--text-light);
+  font-weight: 500;
+  min-width: 90px;
+}
+
+.mobile-visit-card .card-row .value {
+  text-align: right;
+  flex: 1;
+  font-weight: 400;
+}
+
+.mobile-visit-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-visit-card .card-header .name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* ========== BADGES ========== */
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.badge-registered { background-color: #dbeafe; color: #1e40af; }
+.badge-checked_in { background-color: #fef3c7; color: #92400e; }
+.badge-completed { background-color: #d1fae5; color: #065f46; }
+
+/* ========== QR SCANNER ========== */
+
+#qr-reader {
+  max-width: 100%;
+}
+
+#qr-reader video {
+  border-radius: 8px;
+}
+
+/* ========== MOBILE OVERLAY (for hamburger drawer) ========== */
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+}
+
+.mobile-overlay.active {
+  display: block;
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE BREAKPOINT (768px and below)
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* ---- Header & Nav ---- */
+  .hamburger-btn {
+    display: block;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg-card);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 4rem 1.5rem 2rem;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+    transition: right 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .nav-links.open {
+    right: 0;
+  }
+
+  .nav-links .nav-user-info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+  }
+
+  .nav-links a {
+    margin: 0;
+    padding: 0.75rem 0;
+    width: 100%;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: block;
+  }
+
+  .nav-links .nav-logout-btn {
+    margin-top: 1.5rem;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  /* ---- Container ---- */
+  .container {
+    padding: 0.75rem;
+  }
+
+  /* ---- Card ---- */
+  .card {
+    padding: 1rem;
+  }
+
+  /* ---- Tables hidden, cards shown ---- */
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-card-list {
+    display: block;
+  }
+
+  /* ---- Admin Dashboard Adjustments ---- */
+  .admin-guards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-filter-bar {
+    flex-direction: column !important;
+    gap: 0.75rem;
+  }
+
+  .admin-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-tabs .btn {
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* ---- Form improvements ---- */
+  .form-control {
+    padding: 0.875rem;
+  }
+
+  .btn {
+    padding: 0.875rem 1.5rem;
+  }
+
+  /* ---- Search bar stacking ---- */
+  .search-bar {
+    flex-direction: column !important;
+  }
+
+  .search-bar .btn {
+    width: 100%;
+  }
+
+  /* ---- Page headers ---- */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem;
+  }
+
+  /* ---- QR Scanner ---- */
+  #qr-reader__dashboard_section_swaplink,
+  #qr-reader__status_span {
+    font-size: 0.875rem !important;
+  }
+
+  /* ---- Action buttons stacking ---- */
+  .action-buttons {
+    flex-direction: column !important;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+
+  /* ---- Visitor detail grid ---- */
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ---- Login & Public pages ---- */
+  .auth-wrapper {
+    margin: 1.5rem auto !important;
+    padding: 0 0.75rem;
+  }
+
+  /* ---- Headings ---- */
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* ============================================================
+   EXTRA SMALL SCREENS (below 400px)
+   ============================================================ */
+
+@media (max-width: 400px) {
+  .card {
+    padding: 0.75rem;
+    border-radius: 6px;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .mobile-visit-card .card-row {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .mobile-visit-card .card-row .value {
+    text-align: left;
+  }
+}
