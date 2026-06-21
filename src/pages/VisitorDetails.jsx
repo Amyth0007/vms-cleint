@@ -2,6 +2,46 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 
+const ExpandableHistoryCard = ({ visit }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  return (
+    <div className="mobile-visit-card" style={{ cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
+      <div 
+        className="card-header" 
+        style={{ borderBottom: isExpanded ? '1px solid var(--border-color)' : 'none', marginBottom: isExpanded ? '0.5rem' : '0', paddingBottom: isExpanded ? '0.5rem' : '0' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span className="name">{new Date(visit.createdAt).toLocaleDateString()}</span>
+        </div>
+        <span className={`badge badge-${visit.status}`}>
+          {visit.status.replace('_', ' ').toUpperCase()}
+        </span>
+      </div>
+      {isExpanded && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <div className="card-row">
+            <span className="label">Host</span>
+            <span className="value">{visit.hostName || '-'} ({visit.hostDepartment || '-'})</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Purpose</span>
+            <span className="value">{visit.purpose || '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Check-In</span>
+            <span className="value">{visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Check-Out</span>
+            <span className="value">{visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const VisitorDetails = () => {
   const { id } = useParams();
   const [visitor, setVisitor] = useState(null);
@@ -91,30 +131,7 @@ const VisitorDetails = () => {
             {/* Mobile Cards */}
             <div className="mobile-card-list" style={{ marginTop: '1rem' }}>
               {history.map((visit) => (
-                <div className="mobile-visit-card" key={visit._id}>
-                  <div className="card-header">
-                    <span className="name">{new Date(visit.createdAt).toLocaleDateString()}</span>
-                    <span className={`badge badge-${visit.status}`}>
-                      {visit.status.replace('_', ' ').toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Host</span>
-                    <span className="value">{visit.hostName || '-'} ({visit.hostDepartment || '-'})</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Purpose</span>
-                    <span className="value">{visit.purpose || '-'}</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Check-In</span>
-                    <span className="value">{visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Check-Out</span>
-                    <span className="value">{visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}</span>
-                  </div>
-                </div>
+                <ExpandableHistoryCard key={visit._id} visit={visit} />
               ))}
             </div>
           </>

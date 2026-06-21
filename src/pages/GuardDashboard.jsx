@@ -2,6 +2,52 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 
+const ExpandableVisitCard = ({ visit }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="mobile-visit-card" style={{ cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
+      <div 
+        className="card-header" 
+        style={{ borderBottom: isExpanded ? '1px solid var(--border-color)' : 'none', marginBottom: isExpanded ? '0.5rem' : '0', paddingBottom: isExpanded ? '0.5rem' : '0' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span className="name">{visit.visitor?.name}</span>
+        </div>
+        <span className={`badge badge-${visit.status}`}>
+          {visit.status.replace('_', ' ').toUpperCase()}
+        </span>
+      </div>
+
+      {isExpanded && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <div className="card-row">
+            <span className="label">Mobile</span>
+            <span className="value">{visit.visitor?.mobile}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Host</span>
+            <span className="value">{visit.hostName || '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Check-in</span>
+            <span className="value">
+              {visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}
+            </span>
+          </div>
+          <div className="card-row">
+            <span className="label">Check-out</span>
+            <span className="value">
+              {visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const GuardDashboard = () => {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,34 +116,7 @@ const GuardDashboard = () => {
             {/* Mobile Cards */}
             <div className="mobile-card-list">
               {visits.map((visit) => (
-                <div className="mobile-visit-card" key={visit._id}>
-                  <div className="card-header">
-                    <span className="name">{visit.visitor?.name}</span>
-                    <span className={`badge badge-${visit.status}`}>
-                      {visit.status.replace('_', ' ').toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Mobile</span>
-                    <span className="value">{visit.visitor?.mobile}</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Host</span>
-                    <span className="value">{visit.hostName || '-'}</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Check-in</span>
-                    <span className="value">
-                      {visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}
-                    </span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Check-out</span>
-                    <span className="value">
-                      {visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}
-                    </span>
-                  </div>
-                </div>
+                <ExpandableVisitCard key={visit._id} visit={visit} />
               ))}
             </div>
           </>

@@ -1,6 +1,97 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
+const ExpandableVisitCard = ({ visit }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  return (
+    <div className="mobile-visit-card" style={{ cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
+      <div 
+        className="card-header" 
+        style={{ borderBottom: isExpanded ? '1px solid var(--border-color)' : 'none', marginBottom: isExpanded ? '0.5rem' : '0', paddingBottom: isExpanded ? '0.5rem' : '0' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span className="name">{visit.visitor?.name}</span>
+        </div>
+        <span className={`badge badge-${visit.status}`}>
+          {visit.status.replace('_', ' ').toUpperCase()}
+        </span>
+      </div>
+      {isExpanded && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <div className="card-row">
+            <span className="label">Mobile</span>
+            <span className="value">{visit.visitor?.mobile}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Host</span>
+            <span className="value">{visit.hostName || '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Purpose</span>
+            <span className="value">{visit.purpose || '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">By</span>
+            <span className="value">{visit.registeredBy?.name || 'Self'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Checked-in</span>
+            <span className="value">{visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Checked-out</span>
+            <span className="value">{visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ExpandableGuardCard = ({ guard, onToggle }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  return (
+    <div className="mobile-visit-card" style={{ cursor: 'pointer' }} onClick={() => setIsExpanded(!isExpanded)}>
+      <div 
+        className="card-header" 
+        style={{ borderBottom: isExpanded ? '1px solid var(--border-color)' : 'none', marginBottom: isExpanded ? '0.5rem' : '0', paddingBottom: isExpanded ? '0.5rem' : '0' }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span className="name">{guard.name}</span>
+        </div>
+        <span className={`badge ${guard.isActive ? 'badge-completed' : 'badge-registered'}`}>
+          {guard.isActive ? 'Active' : 'Inactive'}
+        </span>
+      </div>
+      {isExpanded && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <div className="card-row">
+            <span className="label">Email</span>
+            <span className="value">{guard.email}</span>
+          </div>
+          <div className="card-row">
+            <span className="label">Role</span>
+            <span className="value">{guard.role.toUpperCase()}</span>
+          </div>
+          {guard.role !== 'admin' && (
+            <div style={{ marginTop: '0.75rem' }} onClick={e => e.stopPropagation()}>
+              <button 
+                className="btn" 
+                style={{ width: '100%', fontSize: '0.875rem', padding: '0.5rem', backgroundColor: guard.isActive ? 'var(--error)' : 'var(--success)' }}
+                onClick={() => onToggle(guard._id)}
+              >
+                {guard.isActive ? 'Deactivate' : 'Activate'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('visits'); // 'visits' or 'guards'
   const [visits, setVisits] = useState([]);
@@ -13,6 +104,7 @@ const AdminDashboard = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [showGuardPassword, setShowGuardPassword] = useState(false);
   const [guardFormLoading, setGuardFormLoading] = useState(false);
+  const [guardTab, setGuardTab] = useState('view'); // 'view' or 'add'
 
   useEffect(() => {
     fetchData();
@@ -184,38 +276,7 @@ const AdminDashboard = () => {
                 {/* Mobile Cards */}
                 <div className="mobile-card-list">
                   {visits.map(visit => (
-                    <div className="mobile-visit-card" key={visit._id}>
-                      <div className="card-header">
-                        <span className="name">{visit.visitor?.name}</span>
-                        <span className={`badge badge-${visit.status}`}>
-                          {visit.status.replace('_', ' ').toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">Mobile</span>
-                        <span className="value">{visit.visitor?.mobile}</span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">Host</span>
-                        <span className="value">{visit.hostName || '-'}</span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">Purpose</span>
-                        <span className="value">{visit.purpose || '-'}</span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">By</span>
-                        <span className="value">{visit.registeredBy?.name || 'Self'}</span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">Checked-in</span>
-                        <span className="value">{visit.checkInTime ? new Date(visit.checkInTime).toLocaleTimeString() : '-'}</span>
-                      </div>
-                      <div className="card-row">
-                        <span className="label">Checked-out</span>
-                        <span className="value">{visit.checkOutTime ? new Date(visit.checkOutTime).toLocaleTimeString() : '-'}</span>
-                      </div>
-                    </div>
+                    <ExpandableVisitCard key={visit._id} visit={visit} />
                   ))}
                 </div>
               </>
@@ -223,145 +284,165 @@ const AdminDashboard = () => {
           </div>
         </div>
       ) : (
-        <div className="admin-guards-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-          {/* Add Guard Form */}
-          <div className="card">
-            <h3>Add New Guard</h3>
-            {formError && <div className="alert alert-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>{formError}</div>}
-            {formSuccess && <div className="alert alert-success" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>{formSuccess}</div>}
-            <form onSubmit={handleGuardSubmit} style={{ marginTop: '1rem' }}>
-              <div className="form-group">
-                <label className="form-label">Name</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  value={guardForm.name} 
-                  onChange={e => setGuardForm({ ...guardForm, name: e.target.value })} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Email</label>
-                <input 
-                  type="email" 
-                  className="form-control" 
-                  value={guardForm.email} 
-                  onChange={e => setGuardForm({ ...guardForm, email: e.target.value })} 
-                  required 
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div style={{ position: 'relative' }}>
+        <div>
+          {/* Sub-tabs for Guard Management */}
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+            <button 
+              className="btn" 
+              onClick={() => setGuardTab('view')}
+              style={{ 
+                padding: '0.5rem 1.25rem', 
+                fontSize: '0.875rem', 
+                backgroundColor: guardTab === 'view' ? 'var(--primary-color)' : '#e5e7eb',
+                color: guardTab === 'view' ? 'white' : 'var(--text-main)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              📋 View Guards
+            </button>
+            <button 
+              className="btn" 
+              onClick={() => setGuardTab('add')}
+              style={{ 
+                padding: '0.5rem 1.25rem', 
+                fontSize: '0.875rem', 
+                backgroundColor: guardTab === 'add' ? 'var(--primary-color)' : '#e5e7eb',
+                color: guardTab === 'add' ? 'white' : 'var(--text-main)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              ➕ Add Guard
+            </button>
+          </div>
+
+          {guardTab === 'add' ? (
+            /* Add Guard Form */
+            <div className="card" style={{ maxWidth: '500px', margin: '0 auto' }}>
+              <h3>Add New Guard</h3>
+              {formError && <div className="alert alert-error" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>{formError}</div>}
+              {formSuccess && <div className="alert alert-success" style={{ padding: '0.5rem', marginTop: '0.5rem' }}>{formSuccess}</div>}
+              <form onSubmit={handleGuardSubmit} style={{ marginTop: '1rem' }} autoComplete="off">
+                <div className="form-group">
+                  <label className="form-label">Name</label>
                   <input 
-                    type={showGuardPassword ? 'text' : 'password'} 
+                    type="text" 
                     className="form-control" 
-                    value={guardForm.password} 
-                    onChange={e => setGuardForm({ ...guardForm, password: e.target.value })} 
+                    value={guardForm.name} 
+                    onChange={e => setGuardForm({ ...guardForm, name: e.target.value })} 
                     required 
-                    style={{ paddingRight: '2.5rem' }}
+                    autoComplete="off"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowGuardPassword(!showGuardPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '1.2rem',
-                      padding: '4px',
-                      display: 'flex',
-                      alignItems: 'center'
-                    }}
-                    aria-label={showGuardPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showGuardPassword ? '👁️' : '🙈'}
-                  </button>
                 </div>
-              </div>
-              <button type="submit" className="btn" style={{ width: '100%' }} disabled={guardFormLoading}>
-                {guardFormLoading ? 'Adding...' : 'Add Guard'}
-              </button>
-            </form>
-          </div>
-
-          {/* Guards List */}
-          <div className="card">
-            <h3>Guards List</h3>
-
-            {/* Desktop Table */}
-            <table className="desktop-table" style={{ marginTop: '1rem' }}>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {guards.map(guard => (
-                  <tr key={guard._id}>
-                    <td>{guard.name}</td>
-                    <td>{guard.email}</td>
-                    <td>
-                      <span className={`badge ${guard.isActive ? 'badge-completed' : 'badge-registered'}`}>
-                        {guard.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td>
-                      {guard.role !== 'admin' && (
-                        <button 
-                          className="btn" 
-                          style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem', backgroundColor: guard.isActive ? 'var(--error)' : 'var(--success)' }}
-                          onClick={() => handleGuardToggle(guard._id)}
-                        >
-                          {guard.isActive ? 'Deactivate' : 'Activate'}
-                        </button>
+                <div className="form-group">
+                  <label className="form-label">Email</label>
+                  <input 
+                    type="email" 
+                    className="form-control" 
+                    value={guardForm.email} 
+                    onChange={e => setGuardForm({ ...guardForm, email: e.target.value })} 
+                    required 
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type={showGuardPassword ? 'text' : 'password'} 
+                      className="form-control" 
+                      value={guardForm.password} 
+                      onChange={e => setGuardForm({ ...guardForm, password: e.target.value })} 
+                      required 
+                      style={{ paddingRight: '2.5rem' }}
+                      autoComplete="new-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowGuardPassword(!showGuardPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                      aria-label={showGuardPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showGuardPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-light)' }}>
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                          <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-light)' }}>
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Mobile Cards */}
-            <div className="mobile-card-list" style={{ marginTop: '1rem' }}>
-              {guards.map(guard => (
-                <div className="mobile-visit-card" key={guard._id}>
-                  <div className="card-header">
-                    <span className="name">{guard.name}</span>
-                    <span className={`badge ${guard.isActive ? 'badge-completed' : 'badge-registered'}`}>
-                      {guard.isActive ? 'Active' : 'Inactive'}
-                    </span>
+                    </button>
                   </div>
-                  <div className="card-row">
-                    <span className="label">Email</span>
-                    <span className="value">{guard.email}</span>
-                  </div>
-                  <div className="card-row">
-                    <span className="label">Role</span>
-                    <span className="value">{guard.role.toUpperCase()}</span>
-                  </div>
-                  {guard.role !== 'admin' && (
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <button 
-                        className="btn" 
-                        style={{ width: '100%', fontSize: '0.875rem', backgroundColor: guard.isActive ? 'var(--error)' : 'var(--success)' }}
-                        onClick={() => handleGuardToggle(guard._id)}
-                      >
-                        {guard.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                    </div>
-                  )}
                 </div>
-              ))}
+                <button type="submit" className="btn" style={{ width: '100%' }} disabled={guardFormLoading}>
+                  {guardFormLoading ? 'Adding...' : 'Add Guard'}
+                </button>
+              </form>
             </div>
-          </div>
+          ) : (
+            /* Guards List */
+            <div className="card">
+              <h3>Guards List</h3>
+              
+              {/* Desktop Table */}
+              <table className="desktop-table" style={{ marginTop: '1rem' }}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {guards.map(guard => (
+                    <tr key={guard._id}>
+                      <td>{guard.name}</td>
+                      <td>{guard.email}</td>
+                      <td>
+                        <span className={`badge ${guard.isActive ? 'badge-completed' : 'badge-registered'}`}>
+                          {guard.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>
+                        {guard.role !== 'admin' && (
+                          <button 
+                            className="btn" 
+                            style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem', backgroundColor: guard.isActive ? 'var(--error)' : 'var(--success)' }}
+                            onClick={() => handleGuardToggle(guard._id)}
+                          >
+                            {guard.isActive ? 'Deactivate' : 'Activate'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Mobile Cards */}
+              <div className="mobile-card-list" style={{ marginTop: '1rem' }}>
+                {guards.map(guard => (
+                  <ExpandableGuardCard key={guard._id} guard={guard} onToggle={handleGuardToggle} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
