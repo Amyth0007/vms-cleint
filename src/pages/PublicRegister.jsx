@@ -85,7 +85,7 @@ const PublicRegister = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Purpose of Visit</label>
-              <input type="text" className="form-control" name="purpose" value={formData.purpose} onChange={handleChange} placeholder="e.g. Meet Professor, Delivery" />
+              <input type="text" className="form-control" name="purpose" value={formData.purpose} onChange={handleChange} placeholder="e.g. Meet Professor, Delivery" required />
             </div>
             <div className="form-group">
               <label className="form-label">Host Name</label>

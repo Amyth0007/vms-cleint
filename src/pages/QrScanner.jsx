@@ -29,7 +29,7 @@ const QrScanner = () => {
 
     scanner.render(
       (decodedText) => {
-        scanner.clear();
+        scanner.clear().catch(e => console.error("Error clearing scanner:", e));
         setScanResult(decodedText);
         fetchVisitDetails(decodedText);
       },

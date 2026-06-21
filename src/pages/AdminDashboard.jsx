@@ -11,6 +11,8 @@ const AdminDashboard = () => {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [showGuardPassword, setShowGuardPassword] = useState(false);
+  const [guardFormLoading, setGuardFormLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -64,6 +66,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setFormError('');
     setFormSuccess('');
+    setGuardFormLoading(true);
     try {
       const response = await api.post('/auth/users', guardForm);
       if (response.data.success) {
@@ -74,6 +77,8 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       setFormError(err.response?.data?.message || 'Failed to create user');
+    } finally {
+      setGuardFormLoading(false);
     }
   };
 
@@ -247,15 +252,40 @@ const AdminDashboard = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Password</label>
-                <input 
-                  type="password" 
-                  className="form-control" 
-                  value={guardForm.password} 
-                  onChange={e => setGuardForm({ ...guardForm, password: e.target.value })} 
-                  required 
-                />
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type={showGuardPassword ? 'text' : 'password'} 
+                    className="form-control" 
+                    value={guardForm.password} 
+                    onChange={e => setGuardForm({ ...guardForm, password: e.target.value })} 
+                    required 
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowGuardPassword(!showGuardPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    aria-label={showGuardPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showGuardPassword ? '👁️' : '🙈'}
+                  </button>
+                </div>
               </div>
-              <button type="submit" className="btn" style={{ width: '100%' }}>Add Guard</button>
+              <button type="submit" className="btn" style={{ width: '100%' }} disabled={guardFormLoading}>
+                {guardFormLoading ? 'Adding...' : 'Add Guard'}
+              </button>
             </form>
           </div>
 

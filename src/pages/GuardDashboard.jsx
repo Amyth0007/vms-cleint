@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const GuardDashboard = () => {
@@ -24,6 +25,11 @@ const GuardDashboard = () => {
   return (
     <div>
       <h2>Guard Dashboard — Today's Visits</h2>
+      
+      <Link to="/qr-scanner" className="btn guard-scan-btn" style={{ display: 'none', width: '100%', margin: '1rem 0', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', backgroundColor: 'var(--primary-color)' }}>
+        📷 Scan Entry/Exit QR Code
+      </Link>
+
       <div className="card" style={{ marginTop: '1.5rem' }}>
         {loading ? (
           <p>Loading...</p>

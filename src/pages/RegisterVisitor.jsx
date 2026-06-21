@@ -77,7 +77,7 @@ const RegisterVisitor = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Purpose of Visit</label>
-              <input type="text" className="form-control" name="purpose" value={formData.purpose} onChange={handleChange} />
+              <input type="text" className="form-control" name="purpose" value={formData.purpose} onChange={handleChange} required />
             </div>
             <div className="form-group">
               <label className="form-label">Host Name</label>
