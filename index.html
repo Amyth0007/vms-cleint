@@ -5,6 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>College VMS — Visitor Management System</title>
+    <script>
+      (function () {
+        var local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        var api = local ? 'http://localhost:5000/api' : 'https://vms-server-639r.onrender.com/api';
+        fetch(api + '/health', { mode: 'cors', cache: 'no-store' }).catch(function () {});
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

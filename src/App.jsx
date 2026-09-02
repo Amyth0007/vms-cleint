@@ -7,12 +7,16 @@ import QrScanner from './pages/QrScanner';
 import VisitorSearch from './pages/VisitorSearch';
 import VisitorDetails from './pages/VisitorDetails';
 import PublicRegister from './pages/PublicRegister';
+import PassManagement from './pages/PassManagement';
+import PassDetails from './pages/PassDetails';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ApiWakeup from './components/ApiWakeup';
 
 function App() {
   return (
     <Router>
+      <ApiWakeup />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<PublicRegister />} />
@@ -67,6 +71,22 @@ function App() {
                 <VisitorDetails />
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/passes"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <PassManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/passes/:id"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <PassDetails />
+              </ProtectedRoute>
+            }
           />
         </Route>
         
