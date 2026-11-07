@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ProcessVisitModal from '../components/ProcessVisitModal';
 import VisitLog from '../components/VisitLog';
 import { useAuth } from '../hooks/useAuth';
+import PageHeader from '../components/PageHeader';
 
 const staffId = (user) => (user?._id || user?.id ? String(user._id || user.id) : '');
 
@@ -12,8 +13,10 @@ const GuardDashboard = () => {
 
   return (
     <div>
-      <h2 className="page-title">Dashboard</h2>
-      <p className="page-sub">Scan the visitor QR. Use All visits if you need the list.</p>
+      <PageHeader
+        title="Gate dashboard"
+        subtitle="Scan a visitor QR, or review today’s visits."
+      />
 
       {staffId(user) ? (
         <VisitLog

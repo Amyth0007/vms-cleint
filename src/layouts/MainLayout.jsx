@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { initials } from '../utils/format';
+import Brand from '../components/Brand';
 
 const Icon = ({ children }) => (
   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -61,7 +62,7 @@ const MainLayout = () => {
       <header className="header">
         <div className="header-container">
           <Link to={home} className="brand">
-            College VMS
+            <Brand compact />
           </Link>
 
           {user && (

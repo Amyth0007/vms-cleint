@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import { formatDateTime } from '../utils/format';
+import PageHeader from '../components/PageHeader';
+import LoadingState from '../components/LoadingState';
+import EmptyState from '../components/EmptyState';
 
 const PassDetails = () => {
   const { id } = useParams();
@@ -24,17 +27,20 @@ const PassDetails = () => {
     load();
   }, [id]);
 
-  if (loading) return <p>Loading pass history…</p>;
+  if (loading) return <LoadingState text="Loading pass history…" />;
   if (error) return <div className="alert alert-error">{error}</div>;
-  if (!data) return <p>Pass not found.</p>;
+  if (!data) return <EmptyState title="Pass not found" text="This pass may have been removed." />;
 
   const { pass, visits } = data;
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div className="page-header no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
-        <h2>{pass.code} — history</h2>
-        <Link to="/passes" className="btn-link">Back</Link>
+      <div className="no-print">
+        <PageHeader
+          title={`${pass.code} history`}
+          subtitle="Who has used this physical pass."
+          actions={<Link to="/passes" className="btn btn-ghost btn-sm">Back to passes</Link>}
+        />
       </div>
 
       <div className="card" style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>

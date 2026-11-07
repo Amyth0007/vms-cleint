@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import StatusBadge from './StatusBadge';
+import VisitorAvatar from './VisitorAvatar';
+import EmptyState from './EmptyState';
 import { formatDateTime } from '../utils/format';
 
 const STATUS_CHIPS = [
@@ -57,6 +59,7 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
   });
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -79,6 +82,7 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      setError('');
       try {
         const params = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
@@ -89,8 +93,9 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
           setVisits(res.data.data || []);
           if (res.data.meta) setMeta(res.data.meta);
         }
-      } catch (error) {
-        console.error('Error fetching visits', error);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Could not load visits');
+        setVisits([]);
       } finally {
         setLoading(false);
       }
@@ -263,10 +268,14 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
       </div>
 
       <div className="card">
+        {error && <div className="alert alert-error">{error}</div>}
         {loading ? (
           <p className="muted">Loading visits…</p>
         ) : visits.length === 0 ? (
-          <p className="muted">No visits match these filters.</p>
+          <EmptyState
+            title="No visits yet"
+            text={error ? 'Try again in a moment.' : 'No visits match these filters. Register a visitor or scan a QR to get started.'}
+          />
         ) : (
           <>
             <div className="table-scroll">
@@ -285,8 +294,13 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
                   {visits.map((visit) => (
                     <tr key={visit._id}>
                       <td>
-                        <div>{visit.visitor?.name}</div>
-                        <div className="col-secondary">{visit.visitor?.mobile}</div>
+                        <div className="visitor-cell">
+                          <VisitorAvatar src={visit.visitor?.photo} name={visit.visitor?.name} size={36} />
+                          <div>
+                            <div>{visit.visitor?.name}</div>
+                            <div className="col-secondary">{visit.visitor?.mobile}</div>
+                          </div>
+                        </div>
                       </td>
                       <td>{visit.pass?.code || 'Phone'}</td>
                       <td><StatusBadge status={visit.status} /></td>
@@ -315,7 +329,10 @@ const VisitLog = ({ onProcess, refreshKey, variant = 'admin', currentUserId }) =
               {visits.map((visit) => (
                 <div key={visit._id} className="mobile-visit-card">
                   <div className="card-header">
-                    <span className="name">{visit.visitor?.name}</span>
+                    <span className="name visitor-cell">
+                      <VisitorAvatar src={visit.visitor?.photo} name={visit.visitor?.name} size={32} />
+                      {visit.visitor?.name}
+                    </span>
                     <StatusBadge status={visit.status} />
                   </div>
                   <div className="visit-facts">

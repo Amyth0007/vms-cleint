@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import HostDepartmentSelect from '../components/HostDepartmentSelect';
 import FieldError from '../components/FieldError';
+import PhotoCapture from '../components/PhotoCapture';
+import VisitorAvatar from '../components/VisitorAvatar';
 import { rules, firstError } from '../utils/validation';
+import PageHeader from '../components/PageHeader';
 
 const emptyForm = {
   name: '',
@@ -30,6 +33,7 @@ const RegisterVisitor = () => {
   const [passMode, setPassMode] = useState('phone');
   const [availablePasses, setAvailablePasses] = useState([]);
   const [passId, setPassId] = useState('');
+  const [photo, setPhoto] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
@@ -77,11 +81,13 @@ const RegisterVisitor = () => {
     try {
       const payload = { ...formData, mobile: formData.mobile.replace(/\D/g, '') };
       if (passMode === 'pass') payload.passId = passId;
+      if (photo) payload.photo = photo;
       const response = await api.post('/visits/register', payload);
       if (response.data.success) {
         setResult(response.data.data);
         setFormData(emptyForm);
         setPassId('');
+        setPhoto('');
         setFieldErrors({});
       }
     } catch (err) {
@@ -95,12 +101,21 @@ const RegisterVisitor = () => {
 
   return (
     <div className="form-page">
-      <h2 className="page-title">Register visitor</h2>
-      <p className="page-sub">Phone QR or a numbered pass for the gate</p>
+      <PageHeader
+        title="Register visitor"
+        subtitle="Optional photo, then a phone QR or numbered pass for the gate."
+      />
 
       {result ? (
         <div className="card" style={{ textAlign: 'center' }}>
           <h3 style={{ color: 'var(--success)', marginBottom: '1rem' }}>Visitor registered</h3>
+          <div className="result-hero">
+            <VisitorAvatar src={result.visitor?.photo} name={result.visitor?.name} size={88} />
+            <div>
+              <strong>{result.visitor?.name}</strong>
+              <p className="muted">{result.visitor?.mobile}</p>
+            </div>
+          </div>
           {assignedPass ? (
             <>
               <p>Hand physical card <strong>{assignedPass.code}</strong> to the visitor.</p>
@@ -122,6 +137,7 @@ const RegisterVisitor = () => {
         <div className="card">
           {error && <div className="alert alert-error">{error}</div>}
           <form onSubmit={handleSubmit} noValidate>
+            <PhotoCapture value={photo} onChange={setPhoto} name={formData.name} />
             <div className="form-group">
               <label className="form-label">Pass type</label>
               <div className="segmented">

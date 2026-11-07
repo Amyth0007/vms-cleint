@@ -59,9 +59,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const url = error.config?.url || '';
+    const isLogin = url.includes('/auth/login');
+    if (error.response?.status === 401 && !isLogin) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      window.dispatchEvent(new Event('vms:logout'));
     }
     return Promise.reject(error);
   }

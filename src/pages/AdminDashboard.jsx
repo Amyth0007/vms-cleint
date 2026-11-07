@@ -6,6 +6,7 @@ import VisitLog from '../components/VisitLog';
 import DepartmentManager from '../components/DepartmentManager';
 import FieldError from '../components/FieldError';
 import { rules, firstError } from '../utils/validation';
+import PageHeader from '../components/PageHeader';
 
 const ExpandableGuardCard = ({ guard, onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -112,8 +113,10 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      <h2 className="page-title">Dashboard</h2>
-      <p className="page-sub">Visit analytics, staff accounts, and departments</p>
+      <PageHeader
+        title="Operations"
+        subtitle="Visits, staff accounts, and host departments."
+      />
 
       <div className="tabs">
         <button type="button" className={`tab ${activeTab === 'visits' ? 'active' : ''}`} onClick={() => setActiveTab('visits')}>

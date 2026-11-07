@@ -2,14 +2,20 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import FieldError from '../components/FieldError';
+import VisitorAvatar from '../components/VisitorAvatar';
 import { rules } from '../utils/validation';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 
 const ExpandableVisitorCard = ({ visitor }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div className="mobile-visit-card" onClick={() => setIsExpanded(!isExpanded)}>
       <div className="card-header">
-        <span className="name">{visitor.name}</span>
+        <span className="name visitor-cell">
+          <VisitorAvatar src={visitor.photo} name={visitor.name} size={32} />
+          {visitor.name}
+        </span>
         <span className="badge badge-registered">{visitor.visitorType}</span>
       </div>
       {isExpanded && (
@@ -55,9 +61,8 @@ const VisitorSearch = () => {
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <h2 className="page-title">Search visitors</h2>
-      <p className="page-sub">Find someone by name or mobile</p>
+    <div className="content-narrow">
+      <PageHeader title="Search visitors" subtitle="Find someone by name or mobile number." />
       <div className="card">
         <form onSubmit={handleSearch} className="search-bar" style={{ display: 'flex', gap: '0.75rem' }}>
           <input
@@ -82,7 +87,7 @@ const VisitorSearch = () => {
       {searched && (
         <div className="card" style={{ marginTop: '1rem' }}>
           {visitors.length === 0 ? (
-            <p className="muted">{loading ? 'Searching…' : 'No matches.'}</p>
+            <EmptyState title={loading ? 'Searching…' : 'No matches'} text={loading ? 'Looking up visitors.' : 'Try another name or mobile number.'} />
           ) : (
             <>
               <table className="desktop-table">
@@ -97,7 +102,12 @@ const VisitorSearch = () => {
                 <tbody>
                   {visitors.map((visitor) => (
                     <tr key={visitor._id}>
-                      <td>{visitor.name}</td>
+                      <td>
+                        <div className="visitor-cell">
+                          <VisitorAvatar src={visitor.photo} name={visitor.name} size={36} />
+                          <span>{visitor.name}</span>
+                        </div>
+                      </td>
                       <td className="col-secondary">{visitor.mobile}</td>
                       <td className="col-secondary">{visitor.visitorType}</td>
                       <td>

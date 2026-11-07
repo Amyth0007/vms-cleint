@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import api from '../services/api';
 import VisitScanPanel from './VisitScanPanel';
 import QrCapture from './QrCapture';
+import VisitorAvatar from './VisitorAvatar';
 
 const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
   const [visit, setVisit] = useState(null);
@@ -9,7 +10,9 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [done, setDone] = useState(false);
+  const [photo, setPhoto] = useState('');
   const busyRef = useRef(false);
+  const photoRef = useRef('');
 
   useEffect(() => {
     const load = async () => {
@@ -23,6 +26,7 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
         if (res.data.success) {
           const data = res.data.data;
           setVisit(data);
+          setPhoto(data.visitor?.photo || '');
           if (data.status === 'completed') setDone(true);
         }
       } catch (err) {
@@ -33,6 +37,33 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
     };
     load();
   }, [visitId]);
+
+  useEffect(() => {
+    photoRef.current = photo;
+  }, [photo]);
+
+  const persistPhoto = async (currentVisit, nextPhoto) => {
+    const visitorId = currentVisit?.visitor?._id;
+    if (!visitorId) return currentVisit;
+    const photoValue = nextPhoto || null;
+    if ((currentVisit.visitor?.photo || null) === photoValue) return currentVisit;
+    const saved = await api.put(`/visitors/${visitorId}`, { photo: photoValue });
+    return {
+      ...currentVisit,
+      visitor: saved.data.data || { ...currentVisit.visitor, photo: photoValue },
+    };
+  };
+
+  const handlePhotoChange = async (url) => {
+    setPhoto(url);
+    if (!visit?.visitor?._id) return;
+    try {
+      const next = await persistPhoto(visit, url);
+      setVisit(next);
+    } catch {
+      /* keep local preview */
+    }
+  };
 
   const handleDecode = async (token) => {
     if (busyRef.current || !visit) return;
@@ -57,10 +88,13 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
       const action = scanned.status === 'registered' ? 'check-in' : 'check-out';
       const res = await api.post(`/visits/${action}`, { qrToken: token });
       if (res.data.success) {
-        setVisit(res.data.data);
+        const next = res.data.data;
+        const withPhoto = await persistPhoto(next, photoRef.current);
+        setVisit(withPhoto);
+        setPhoto(withPhoto.visitor?.photo || photoRef.current);
         setMessage(`Visitor successfully ${action === 'check-in' ? 'checked in' : 'checked out'}!`);
         setDone(true);
-        onUpdated?.(res.data.data);
+        onUpdated?.(withPhoto);
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Scan failed');
@@ -84,11 +118,16 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
           </>
         ) : showCamera ? (
           <>
-            <h3>Scan to {visit.status === 'registered' ? 'check in' : 'check out'}</h3>
-            <p className="page-sub" style={{ marginBottom: '0.75rem' }}>
-              {visit.visitor?.name}
-              {visit.pass?.code ? ` · ${visit.pass.code}` : ' · Phone QR'}
-            </p>
+            <div className="scan-hero">
+              <VisitorAvatar src={visit.visitor?.photo} name={visit.visitor?.name} size={56} />
+              <div>
+                <h3 style={{ marginBottom: '0.15rem' }}>Scan to {visit.status === 'registered' ? 'check in' : 'check out'}</h3>
+                <p className="muted" style={{ margin: 0 }}>
+                  {visit.visitor?.name}
+                  {visit.pass?.code ? ` · ${visit.pass.code}` : ' · Phone QR'}
+                </p>
+              </div>
+            </div>
             {error && <div className="alert alert-error">{error}</div>}
             {loading && <p className="muted">Processing scan…</p>}
             <QrCapture onDecode={handleDecode} paused={Boolean(loading && visit)} />
@@ -102,6 +141,8 @@ const ProcessVisitModal = ({ visitId, onClose, onUpdated }) => {
             loading={loading}
             error={error}
             message={message}
+            photoUrl={photo}
+            onPhotoChange={handlePhotoChange}
             onSecondary={onClose}
             secondaryLabel="Close"
           />

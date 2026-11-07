@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import GuardDashboard from './pages/GuardDashboard';
@@ -10,7 +10,7 @@ import PublicRegister from './pages/PublicRegister';
 import PassManagement from './pages/PassManagement';
 import PassDetails from './pages/PassDetails';
 import MainLayout from './layouts/MainLayout';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute, { HomeRedirect } from './components/ProtectedRoute';
 import ApiWakeup from './components/ApiWakeup';
 
 function App() {
@@ -91,7 +91,8 @@ function App() {
         </Route>
         
         {/* Fallback */}
-        <Route path="/" element={<Navigate to="/register" replace />} />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="*" element={<HomeRedirect />} />
       </Routes>
     </Router>
   );

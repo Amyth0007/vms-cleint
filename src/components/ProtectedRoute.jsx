@@ -1,11 +1,14 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import LoadingState from './LoadingState';
+
+const homeFor = (user) => (user?.role === 'admin' ? '/admin' : '/guard');
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingState text="Checking your session…" />;
   }
 
   if (!user) {
@@ -13,10 +16,17 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />; // Redirect to their default dashboard or unauthorized page
+    return <Navigate to={homeFor(user)} replace />;
   }
 
   return children;
 };
 
 export default ProtectedRoute;
+
+export const HomeRedirect = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingState />;
+  if (user) return <Navigate to={homeFor(user)} replace />;
+  return <Navigate to="/register" replace />;
+};

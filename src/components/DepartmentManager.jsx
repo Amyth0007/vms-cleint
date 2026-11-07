@@ -14,14 +14,16 @@ const DepartmentManager = () => {
   const [formError, setFormError] = useState('');
   const [nameError, setNameError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
   const load = async () => {
     setLoading(true);
+    setLoadError('');
     try {
       const res = await api.get('/departments/manage');
       if (res.data.success) setDepartments(res.data.data || []);
     } catch (error) {
-      console.error('Error fetching departments', error);
+      setLoadError(error.response?.data?.message || 'Could not load departments');
     } finally {
       setLoading(false);
     }
@@ -126,6 +128,7 @@ const DepartmentManager = () => {
         </div>
       )}
 
+      {loadError && <div className="alert alert-error">{loadError}</div>}
       <div className="card">
         {departments.length === 0 ? (
           <p className="muted">No departments yet. Add one to show it on visitor registration.</p>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import { statusLabel } from '../utils/format';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 
 const PassCard = ({ pass, onRelease, onToggle, compact }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -125,21 +127,23 @@ const PassManagement = () => {
 
   return (
     <div className={printMode ? 'print-passes-view' : ''}>
-      <div className="toolbar no-print">
-        <div>
-          <h2 className="page-title">QR passes</h2>
-          <p className="page-sub">Physical cards for visitors without a phone</p>
-        </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => {
-            setPrintMode(true);
-            setTimeout(() => window.print(), 200);
-          }}
-        >
-          Print
-        </button>
+      <div className="no-print">
+        <PageHeader
+          title="Physical passes"
+          subtitle="Reusable QR cards for visitors without a phone."
+          actions={(
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => {
+                setPrintMode(true);
+                setTimeout(() => window.print(), 200);
+              }}
+            >
+              Print
+            </button>
+          )}
+        />
       </div>
 
       {printMode && (
@@ -198,7 +202,10 @@ const PassManagement = () => {
         <p className="muted">Loading passes…</p>
       ) : visible.length === 0 ? (
         <div className="card">
-          <p className="muted">{passes.length === 0 ? 'No passes yet. Create a batch to get started.' : 'No passes match this filter.'}</p>
+          <EmptyState
+            title={passes.length === 0 ? 'No passes yet' : 'Nothing in this filter'}
+            text={passes.length === 0 ? 'Create a batch of QR cards to hand out at the gate.' : 'Try another status filter.'}
+          />
         </div>
       ) : (
         <div className="pass-grid">

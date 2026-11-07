@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import api, { triggerHealthCheck } from '../services/api';
 import HostDepartmentSelect from '../components/HostDepartmentSelect';
 import FieldError from '../components/FieldError';
+import PhotoCapture from '../components/PhotoCapture';
+import VisitorAvatar from '../components/VisitorAvatar';
 import { rules, firstError } from '../utils/validation';
+import Brand from '../components/Brand';
 
 const emptyForm = {
   name: '',
@@ -20,6 +23,9 @@ const PublicRegister = () => {
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
   const [qrCodeData, setQrCodeData] = useState(null);
+  const [photo, setPhoto] = useState('');
+  const [registeredName, setRegisteredName] = useState('');
+  const [registeredPhoto, setRegisteredPhoto] = useState('');
 
   useEffect(() => {
     triggerHealthCheck(true);
@@ -58,13 +64,18 @@ const PublicRegister = () => {
     setQrCodeData(null);
 
     try {
-      const response = await api.post('/visits/public-register', {
+      const payload = {
         ...formData,
         mobile: formData.mobile.replace(/\D/g, ''),
-      });
+      };
+      if (photo) payload.photo = photo;
+      const response = await api.post('/visits/public-register', payload);
       if (response.data.success) {
         setQrCodeData(response.data.data.qrCode);
+        setRegisteredName(formData.name);
+        setRegisteredPhoto(photo || response.data.data.visitor?.photo || '');
         setFormData(emptyForm);
+        setPhoto('');
         setFieldErrors({});
       }
     } catch (err) {
@@ -75,28 +86,32 @@ const PublicRegister = () => {
   };
 
   return (
-    <div className="auth-wrapper form-page">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1.25rem' }}>
-        <div>
-          <h2 className="page-title" style={{ marginBottom: 0 }}>Visitor registration</h2>
-          <p className="page-sub" style={{ marginBottom: 0 }}>Get a QR pass before you arrive</p>
+    <div className="auth-shell">
+      <div className="auth-panel auth-panel-wide">
+        <div className="auth-top">
+          <Brand />
+          <Link to="/login" className="btn btn-ghost btn-sm">Staff sign in</Link>
         </div>
-        <Link to="/login" className="btn-link">Staff login</Link>
-      </div>
+        <h1 className="auth-title">Visitor check-in pass</h1>
+        <p className="muted">Add an optional photo, then generate a QR to show at the gate.</p>
 
       {qrCodeData ? (
         <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
           <h3 style={{ color: 'var(--success)', marginBottom: '1rem' }}>Registration successful</h3>
-          <p style={{ marginBottom: '1rem' }}>Screenshot this QR. Show it at the gate for check-in and check-out.</p>
-          <img src={qrCodeData} alt="Visit QR Code" style={{ maxWidth: '250px', width: '100%', margin: '0 auto', display: 'block' }} />
+          <div className="result-hero">
+            <VisitorAvatar src={registeredPhoto} name={registeredName} size={80} />
+            <p style={{ margin: 0 }}>Screenshot this QR. Show it at the gate for check-in and check-out.</p>
+          </div>
+          <img src={qrCodeData} alt="Visit QR Code" style={{ maxWidth: '250px', width: '100%', margin: '1rem auto', display: 'block' }} />
           <div style={{ marginTop: '1.5rem' }}>
-            <button className="btn" style={{ width: '100%' }} onClick={() => setQrCodeData(null)}>Register another visit</button>
+            <button className="btn" style={{ width: '100%' }} onClick={() => { setQrCodeData(null); setRegisteredName(''); setRegisteredPhoto(''); }}>Register another visit</button>
           </div>
         </div>
       ) : (
         <div className="card">
           {error && <div className="alert alert-error">{error}</div>}
           <form onSubmit={handleSubmit} noValidate>
+            <PhotoCapture value={photo} onChange={setPhoto} name={formData.name} />
             <div className="form-group">
               <label className="form-label">Full name</label>
               <input type="text" className={`form-control ${fieldErrors.name ? 'is-invalid' : ''}`} name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} autoComplete="name" />
@@ -142,6 +157,7 @@ const PublicRegister = () => {
           </form>
         </div>
       )}
+      </div>
     </div>
   );
 };

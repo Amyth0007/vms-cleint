@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
+import PhotoCapture from '../components/PhotoCapture';
+import VisitorAvatar from '../components/VisitorAvatar';
 import { formatTime } from '../utils/format';
+import PageHeader from '../components/PageHeader';
+import LoadingState from '../components/LoadingState';
 
 const ExpandableHistoryCard = ({ visit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -74,24 +78,43 @@ const VisitorDetails = () => {
     fetchVisitorAndHistory();
   }, [id]);
 
-  if (loading) return <p>Loading details...</p>;
+  if (loading) return <LoadingState text="Loading visitor…" />;
   if (error) return <div className="alert alert-error">{error}</div>;
   if (!visitor) return <p>Visitor not found.</p>;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h2 className="page-title" style={{ marginBottom: 0 }}>Visitor</h2>
-        <Link to="/search-visitor" className="btn-link">Back to search</Link>
-      </div>
+    <div className="content-narrow">
+      <PageHeader
+        title="Visitor profile"
+        subtitle="Photo, contact details, and visit history."
+        actions={<Link to="/search-visitor" className="btn btn-ghost btn-sm">Back to search</Link>}
+      />
 
       <div className="card">
-        <h3>Personal Details</h3>
-        <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <p><strong>Name:</strong> {visitor.name}</p>
-          <p><strong>Mobile:</strong> {visitor.mobile}</p>
-          <p><strong>Type:</strong> {visitor.visitorType.toUpperCase()}</p>
+        <div className="scan-hero" style={{ marginBottom: '1rem' }}>
+          <VisitorAvatar src={visitor.photo} name={visitor.name} size={88} />
+          <div>
+            <h3 style={{ marginBottom: '0.2rem' }}>{visitor.name}</h3>
+            <p className="muted" style={{ margin: 0 }}>{visitor.mobile}</p>
+          </div>
         </div>
+        <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '0.5rem' }}>
+          <p><strong>Type:</strong> {visitor.visitorType.toUpperCase()}</p>
+          <p><strong>Mobile:</strong> {visitor.mobile}</p>
+        </div>
+        <PhotoCapture
+          compact
+          value={visitor.photo || ''}
+          name={visitor.name}
+          onChange={async (url) => {
+            try {
+              const res = await api.put(`/visitors/${visitor._id}`, { photo: url || null });
+              if (res.data.success) setVisitor(res.data.data);
+            } catch {
+              /* keep current photo */
+            }
+          }}
+        />
       </div>
 
       <div className="card" style={{ marginTop: '1.5rem' }}>
